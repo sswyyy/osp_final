@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tetris</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div id="tetris">
+    <canvas id="scene"></canvas>
+    <div id="gameOver">
+        <h1>Game Over!</h1>
+        <h4>High Score: <span id="highScore">0</span> </h4>
+        <h3>Your Score: <span id="finalScore">0</span></h3>
+        <div>
+            <label for="userID">User ID:</label>
+            <input type="text" id="userID" placeholder="Enter your user ID">
+        </div>
+        
+        <h2><a href="#" id="restart">Save & Restart</a></h2>
+      
+    </div>
+    <div id="side">
+        <div id="info">
+            <h1 id="levelInfo">Level: <br><span id="level">1</span></h1>
+            <h2 id="scoreInfo">Score: <br><span id="score" >0</span></h2>
+            <h3 id="highscoreInfo">High Score: <br><span id="highscore">0</span></h3>
+            <div id="rewardInfo" class="invisible">+<span id="reward">0</span></div>
+			
+            <canvas id="preview"></canvas>
+			
+			<button id="leaderboardInfo">Leaderboard<br><span id="leaderboard"></span></button>
+			<!-- 추가된 로컬 스토리지 초기화 버튼 -->
+			<h2><a href="#" id="clearLocalStorage">Clear</a></h2>
+        </div>
+    </div>
+</div>
+
+<script src="dist/tetris.js"></script>
+<script>
+    (function(){
+        var tetris = new Tetris('tetris');
+        tetris.start();
+
+        document.getElementById('leaderboardInfo').addEventListener('click', function() {
+            // 새 창으로 팝업 열기 (화면 중앙에 위치)
+            var width = 400;
+            var height = 700;
+            var left = (screen.width - width) / 2;
+            var top = (screen.height - height) / 2 - 100;
+
+            window.open('leaderboard.html', '_blank', 'width=' + width + ', height=' + height + ', left=' + left + ', top=' + top);
+        });
+
+        document.getElementById('clearLocalStorage').addEventListener('click', function() {
+            // 로컬 스토리지 초기화
+            localStorage.clear();
+            alert('Local Storage has been cleared.');
+        });
+
+        document.getElementById('restart').addEventListener('click', function() {
+            // 사용자 ID 및 점수를 가져와서 로컬 스토리지에 저장
+            var userID = document.getElementById('userID').value.trim();
+            var finalScore = parseInt(document.getElementById('finalScore').innerText);
+
+            if (userID === "") {
+                alert("Please enter a valid user ID.");
+            } else {
+                // 저장 로직 추가
+                var userScores = JSON.parse(localStorage.getItem('userScores')) || [];
+                userScores.push({ userID: userID, score: finalScore });
+                localStorage.setItem('userScores', JSON.stringify(userScores));
+                
+                // 입력된 사용자 ID를 리스트에 추가
+                var userList = document.getElementById('userList');
+                var listItem = document.createElement('li');
+                listItem.textContent = userID;
+                userList.appendChild(listItem);
+
+                // 팝업 창의 입력 필드를 초기화
+                document.getElementById('userID').value = "";
+            }
+        });
+    })();
+</script>
+</body>
+</html>
